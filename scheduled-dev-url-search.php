@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Scheduled Dev URL Reference Search
-Description: Searches the database for references to the dev URL and emails the admin with matching table names.
-Version: 1.0
+Description: Searches specific columns in certain tables for references to the dev URL and emails the admin with matching table names.
+Version: 1.1
 Author: Pavel Burminsky
 */
 
@@ -35,18 +35,20 @@ class Scheduled_Dev_URL_Search {
 		global $wpdb;
 		$matching_tables = [];
 
-		$tables = $wpdb->get_col( "SHOW TABLES" );
+		$tables_and_columns = [
+			'wp_posts' => ['post_excerpt', 'post_content', 'guid'],
+			'wp_postmeta' => ['meta_value'],
+			'wp_options' => ['option_value'],
+			'redirection_items' => ['action_data'],
+		];
 
-		foreach ( $tables as $table ) {
-			$columns = $wpdb->get_results( "SHOW COLUMNS FROM $table" );
-
+		foreach ( $tables_and_columns as $table => $columns ) {
 			foreach ( $columns as $column ) {
-				$col_name = $column->Field;
 				foreach ( $this->search_patterns as $pattern ) {
-					$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table WHERE $col_name LIKE %s", $pattern ) );
+					$result = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $table WHERE $column LIKE %s", $pattern ) );
 
 					if ( $result > 0 ) {
-						$matching_tables[] = $table;
+						$matching_tables[] = "$table ($column)";
 						break 2;
 					}
 				}
@@ -77,7 +79,6 @@ class Scheduled_Dev_URL_Search {
 		return strpos( home_url(), 'wpengine.com' ) === false && strpos( home_url(), 'wpenginepowered.com' ) === false;
 	}
 }
-
 
 new Scheduled_Dev_URL_Search();
 
