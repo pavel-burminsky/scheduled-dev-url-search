@@ -2,7 +2,7 @@
 /*
 Plugin Name: Scheduled Dev URL Reference Search
 Description: Searches specific columns in certain tables for references to the dev URL and emails the admin with matching table names.
-Version: 1.1
+Version: 1.2
 Author: Pavel Burminsky
 */
 
@@ -35,11 +35,12 @@ class Scheduled_Dev_URL_Search {
 		global $wpdb;
 		$matching_tables = [];
 
+		$prefix = $wpdb->prefix;
 		$tables_and_columns = [
-			'wp_posts' => ['post_excerpt', 'post_content', 'guid'],
-			'wp_postmeta' => ['meta_value'],
-			'wp_options' => ['option_value'],
-			'redirection_items' => ['action_data'],
+			"{$prefix}posts" => ['post_excerpt', 'post_content', 'guid'],
+			"{$prefix}postmeta" => ['meta_value'],
+			"{$prefix}options" => ['option_value'],
+			"{$prefix}redirection_items" => ['action_data'],
 		];
 
 		foreach ( $tables_and_columns as $table => $columns ) {
