@@ -39,7 +39,6 @@ class Scheduled_Dev_URL_Search {
 		$tables_and_columns = [
 			"{$prefix}posts" => ['post_excerpt', 'post_content', 'guid'],
 			"{$prefix}postmeta" => ['meta_value'],
-			"{$prefix}options" => ['option_value'],
 			"{$prefix}redirection_items" => ['action_data'],
 		];
 
